@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36705.20 d17.14
+VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lighten Automation", "Lighten Automation\Lighten Automation.csproj", "{A694EB1A-9275-4290-B950-8F8A772F25A3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		repository.yaml = repository.yaml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EV_Charging", "EV_Charging\EV_Charging.csproj", "{D8AD81BB-55EA-4440-947D-30EA08813CEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +16,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A694EB1A-9275-4290-B950-8F8A772F25A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A694EB1A-9275-4290-B950-8F8A772F25A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A694EB1A-9275-4290-B950-8F8A772F25A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A694EB1A-9275-4290-B950-8F8A772F25A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8AD81BB-55EA-4440-947D-30EA08813CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8AD81BB-55EA-4440-947D-30EA08813CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8AD81BB-55EA-4440-947D-30EA08813CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8AD81BB-55EA-4440-947D-30EA08813CEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

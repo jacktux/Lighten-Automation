@@ -1,0 +1,6 @@
+@EV_Charging_HostAddress = http://localhost:5073
+
+GET {{EV_Charging_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
