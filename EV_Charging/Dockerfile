@@ -11,8 +11,8 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["EV_Charging/EV_Charging.csproj", "EV_Charging/"]
-RUN dotnet restore "./EV_Charging/EV_Charging.csproj"
+COPY ["EV_Charging.csproj", "EV_Charging/"]
+RUN dotnet restore "./EV_Charging.csproj"
 COPY . .
 WORKDIR "/src/EV_Charging"
 RUN dotnet build "./EV_Charging.csproj" -c $BUILD_CONFIGURATION -o /app/build
