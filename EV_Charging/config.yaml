@@ -1,0 +1,13 @@
+﻿name: "LA - EV Charging"
+version: "1.0.0"
+slug: "ev_charging"
+description: "Lighten Automation EV Charging"
+arch:
+  - amd64
+  - aarch64
+ingress: true
+ingress_port: 9801
+hassio_api: true
+panel_icon: "mdi:language-csharp"
+ports:
+  9801/tcp: 9801
