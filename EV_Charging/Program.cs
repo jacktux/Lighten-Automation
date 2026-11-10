@@ -75,5 +75,7 @@ _ = Task.Run(async () =>
 
 app.MapGet("/", () => Results.Redirect("/config.html"));
 app.MapGet("/config", () => Results.File("wwwroot/config.html", "text/html"));
+app.MapGet("/debug", () => Results.File("wwwroot/debug.html", "text/html"));
+app.MapGet("/diagnostic", () => Results.File("wwwroot/diagnostic.html", "text/html"));
 app.MapControllers();
 app.Run();

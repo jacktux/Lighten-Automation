@@ -62,18 +62,30 @@ public class HomeAssistantService
         try
         {
             var response = await _httpClient.GetAsync($"api/states/{entityId}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
 
-                if (root.TryGetProperty("state", out var stateElement) &&
-                    double.TryParse(stateElement.GetString(), out var value))
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to fetch sensor state for {EntityId}: {StatusCode} - {ReasonPhrase}",
+                    entityId, response.StatusCode, response.ReasonPhrase);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    return value;
+                    _logger.LogError("Authorization failed for {EntityId}. Check if SUPERVISOR_TOKEN is set correctly.", entityId);
                 }
+
+                return 0.0;
             }
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("state", out var stateElement) &&
+                double.TryParse(stateElement.GetString(), out var value))
+            {
+                return value;
+            }
+
             return 0.0;
         }
         catch (Exception ex)
@@ -91,16 +103,20 @@ public class HomeAssistantService
         try
         {
             var response = await _httpClient.GetAsync("api/states/device_tracker.ev3_location");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
 
-                if (root.TryGetProperty("state", out var stateElement))
-                {
-                    return stateElement.GetString()?.Equals("home", StringComparison.OrdinalIgnoreCase) ?? false;
-                }
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to fetch car location: {StatusCode}", response.StatusCode);
+                return false;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("state", out var stateElement))
+            {
+                return stateElement.GetString()?.Equals("home", StringComparison.OrdinalIgnoreCase) ?? false;
             }
             return false;
         }
@@ -119,16 +135,20 @@ public class HomeAssistantService
         try
         {
             var response = await _httpClient.GetAsync("api/states/binary_sensor.garage_ev3_ev_battery_plug");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
 
-                if (root.TryGetProperty("state", out var stateElement))
-                {
-                    return stateElement.GetString()?.Equals("on", StringComparison.OrdinalIgnoreCase) ?? false;
-                }
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to fetch car plug status: {StatusCode}", response.StatusCode);
+                return false;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("state", out var stateElement))
+            {
+                return stateElement.GetString()?.Equals("on", StringComparison.OrdinalIgnoreCase) ?? false;
             }
             return false;
         }
@@ -148,16 +168,32 @@ public class HomeAssistantService
         {
             if (command.Command == "STOP")
             {
-                await _httpClient.PostAsJsonAsync("api/services/input_button/press",
+                var response = await _httpClient.PostAsJsonAsync("api/services/input_button/press",
                     new { entity_id = "input_button.ev_stop_charging" });
-                _logger.LogInformation("Stop charging command sent: {Reason}", command.Reason);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Stop charging command failed: {StatusCode}", response.StatusCode);
+                }
+                else
+                {
+                    _logger.LogInformation("Stop charging command sent: {Reason}", command.Reason);
+                }
             }
             else if (command.Command == "START")
             {
-                await _httpClient.PostAsJsonAsync("api/services/input_button/press",
+                var response = await _httpClient.PostAsJsonAsync("api/services/input_button/press",
                     new { entity_id = "input_button.ev_start_charging" });
-                _logger.LogInformation("Start charging command sent with {Amps}A: {Reason}",
-                    command.TargetAmps, command.Reason);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Start charging command failed: {StatusCode}", response.StatusCode);
+                }
+                else
+                {
+                    _logger.LogInformation("Start charging command sent with {Amps}A: {Reason}",
+                        command.TargetAmps, command.Reason);
+                }
             }
         }
         catch (Exception ex)
@@ -173,9 +209,17 @@ public class HomeAssistantService
     {
         try
         {
-            await _httpClient.PostAsJsonAsync("api/services/input_number/set_value",
+            var response = await _httpClient.PostAsJsonAsync("api/services/input_number/set_value",
                 new { entity_id = "input_number.wattpilot_target_current_ui", value = amps });
-            _logger.LogInformation("Set target current to {Amps}A", amps);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Set target current failed: {StatusCode}", response.StatusCode);
+            }
+            else
+            {
+                _logger.LogInformation("Set target current to {Amps}A", amps);
+            }
         }
         catch (Exception ex)
         {
@@ -190,8 +234,13 @@ public class HomeAssistantService
     {
         try
         {
-            await _httpClient.PostAsJsonAsync("api/services/input_text/set_value",
+            var response = await _httpClient.PostAsJsonAsync("api/services/input_text/set_value",
                 new { entity_id = "input_text.ev_charging_status", value = status });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Update status failed: {StatusCode}", response.StatusCode);
+            }
         }
         catch (Exception ex)
         {
@@ -343,16 +392,21 @@ public class HomeAssistantService
         try
         {
             var response = await _httpClient.GetAsync($"api/states/{entityId}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
 
-                if (root.TryGetProperty("state", out var stateElement))
-                {
-                    return stateElement.GetString() ?? "N/A";
-                }
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to fetch entity state for {EntityId}: {StatusCode}",
+                    entityId, response.StatusCode);
+                return "N/A";
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("state", out var stateElement))
+            {
+                return stateElement.GetString() ?? "N/A";
             }
             return "N/A";
         }
