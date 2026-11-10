@@ -89,8 +89,8 @@ _ = Task.Run(async () =>
     {
         try
         {
-            await chargingBackgroundService.ExecuteChargingCycleAsync();
-            await Task.Delay(5000); // Run every 5 seconds
+            //await chargingBackgroundService.ExecuteChargingCycleAsync();
+            //await Task.Delay(5000); // Run every 5 seconds
         }
         catch (Exception ex)
         {
@@ -99,9 +99,9 @@ _ = Task.Run(async () =>
     }
 });
 
-app.MapGet("/", () => Results.File("wwwroot/config.html", "text/html"));
-app.MapGet("/config", () => Results.File("wwwroot/config.html", "text/html"));
-app.MapGet("/debug", () => Results.File("wwwroot/debug.html", "text/html"));
-app.MapGet("/diagnostic", () => Results.File("wwwroot/diagnostic.html", "text/html"));
+app.MapGet("/", () => Results.File("config.html", "text/html"));
+app.MapGet("/config", () => Results.File("config.html", "text/html"));
+app.MapGet("/debug", () => Results.File("debug.html", "text/html"));
+app.MapGet("/diagnostic", () => Results.File("diagnostic.html", "text/html"));
 app.MapControllers();
 app.Run();
