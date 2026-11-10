@@ -1,5 +1,5 @@
 ﻿name: "LA - EV Charging"
-version: "1.0.8"
+version: "1.0.10"
 slug: "ev_charging"
 description: "Lighten Automation EV Charging"
 arch:
@@ -16,3 +16,7 @@ environment:
 homeassistant_api: true
 api: true
 role: manager
+permissions:
+  - homeassistant.api
+  - homeassistant.read
+  - homeassistant.write
