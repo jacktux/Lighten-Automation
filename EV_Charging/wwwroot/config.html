@@ -1,0 +1,508 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Charging Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group.full {
+            grid-template-columns: 1fr;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ EV Charging Configuration</h1>
+            <p>Lighten Automation - Configure charging parameters</p>
+        </div>
+
+        <div class="content">
+            <div id="alert" class="alert"></div>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading configuration...</p>
+            </div>
+
+            <form id="configForm">
+                <!-- Charging Limits Section -->
+                <div class="section">
+                    <div class="section-title">Charging Limits</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="minAmps">Minimum Charging Amps</label>
+                            <input type="number" id="minAmps" name="minAmps" min="1" max="100">
+                            <div class="help-text">Minimum amps to start charging (A)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="maxAmps">Maximum Charging Amps</label>
+                            <input type="number" id="maxAmps" name="maxAmps" min="1" max="100">
+                            <div class="help-text">Maximum amps for charging (A)</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="wattsPerAmp">Watts Per Amp</label>
+                            <input type="number" id="wattsPerAmp" name="wattsPerAmp" min="100" max="1000">
+                            <div class="help-text">Conversion factor for watts to amps (W/A)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="evChargingThresholdWatts">EV Charging Threshold</label>
+                            <input type="number" id="evChargingThresholdWatts" name="evChargingThresholdWatts">
+                            <div class="help-text">Minimum watts required for active charging (W)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battery Settings Section -->
+                <div class="section">
+                    <div class="section-title">Battery Settings</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="requiredBatterySoc">Required Battery SoC Floor</label>
+                            <input type="number" id="requiredBatterySoc" name="requiredBatterySoc" min="0" max="100">
+                            <div class="help-text">Stop charging if battery SoC falls below this (%)  </div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="defaultTrackingSoc">Default Tracking SoC</label>
+                            <input type="number" id="defaultTrackingSoc" name="defaultTrackingSoc" min="0" max="100">
+                            <div class="help-text">Target battery SoC for solar grab (%)  </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="batteryChargeTargetWatts">Battery Charge Target</label>
+                            <input type="number" id="batteryChargeTargetWatts" name="batteryChargeTargetWatts">
+                            <div class="help-text">Reserved power for battery charging (W)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="maxBatteryDrainWatts">Maximum Battery Drain</label>
+                            <input type="number" id="maxBatteryDrainWatts" name="maxBatteryDrainWatts">
+                            <div class="help-text">Maximum watts to drain from battery (W)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Power Management Section -->
+                <div class="section">
+                    <div class="section-title">Power Management</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="bufferWatts">Power Buffer</label>
+                            <input type="number" id="bufferWatts" name="bufferWatts">
+                            <div class="help-text">Safety buffer to reduce charging (W)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="stopThreshold">Stop Threshold</label>
+                            <input type="number" id="stopThreshold" name="stopThreshold">
+                            <div class="help-text">Amps below which charging is stopped (A)</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="stopDelaySeconds">Stop Delay</label>
+                            <input type="number" id="stopDelaySeconds" name="stopDelaySeconds">
+                            <div class="help-text">Seconds to wait before stopping (s)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="ampDeadband">Amp Deadband</label>
+                            <input type="number" id="ampDeadband" name="ampDeadband">
+                            <div class="help-text">Minimum amp change to trigger update (A)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ramp Settings Section -->
+                <div class="section">
+                    <div class="section-title">Ramp Settings</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="rampUpStepSmall">Small Ramp Step</label>
+                            <input type="number" id="rampUpStepSmall" name="rampUpStepSmall">
+                            <div class="help-text">Small increase per cycle (A)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="rampUpStepLarge">Large Ramp Step</label>
+                            <input type="number" id="rampUpStepLarge" name="rampUpStepLarge">
+                            <div class="help-text">Large increase per cycle (A)</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper full">
+                            <label for="rampUpDiffThreshold">Ramp Difference Threshold</label>
+                            <input type="number" id="rampUpDiffThreshold" name="rampUpDiffThreshold">
+                            <div class="help-text">Amps difference to trigger large step (A)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Boost Section -->
+                <div class="section">
+                    <div class="section-title">Export Boost Settings</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="forceMaxIfExporting">Enable Export Boost</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="forceMaxIfExporting" name="forceMaxIfExporting">
+                                <span>Force maximum amps when exporting power</span>
+                            </div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="requireBatteryChargingForBoost">Require Battery Charging</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="requireBatteryChargingForBoost" name="requireBatteryChargingForBoost">
+                                <span>Battery must be charging for boost</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="exportBoostWatts">Export Boost Threshold</label>
+                            <input type="number" id="exportBoostWatts" name="exportBoostWatts">
+                            <div class="help-text">Watts to trigger export boost (W)</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="exportBoostDelaySeconds">Export Boost Delay</label>
+                            <input type="number" id="exportBoostDelaySeconds" name="exportBoostDelaySeconds">
+                            <div class="help-text">Seconds before applying boost (s)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-reset" onclick="resetConfig()">Reset to Defaults</button>
+                    <button type="submit" class="btn-save">Save Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/config';
+
+        // Load configuration on page load
+        document.addEventListener('DOMContentLoaded', loadConfig);
+
+        // Handle form submission
+        document.getElementById('configForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveConfig();
+        });
+
+        async function loadConfig() {
+            showLoading(true);
+            try {
+                const response = await fetch(API_BASE);
+                if (!response.ok) {
+                    throw new Error('Failed to load configuration');
+                }
+
+                const config = await response.json();
+                populateForm(config);
+                showAlert('Configuration loaded successfully', 'success');
+            } catch (error) {
+                showAlert('Error loading configuration: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function populateForm(config) {
+            Object.keys(config).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = config[key];
+                    } else {
+                        element.value = config[key];
+                    }
+                }
+            });
+        }
+
+        async function saveConfig() {
+            const config = getFormData();
+
+            // Basic validation
+            if (config.minAmps < 1 || config.minAmps > config.maxAmps) {
+                showAlert('MinAmps must be between 1 and MaxAmps', 'error');
+                return;
+            }
+
+            if (config.maxAmps < config.minAmps || config.maxAmps > 100) {
+                showAlert('MaxAmps must be between MinAmps and 100', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save configuration');
+                }
+
+                const result = await response.json();
+                showAlert('Configuration saved successfully!', 'success');
+            } catch (error) {
+                showAlert('Error saving configuration: ' + error.message, 'error');
+            }
+        }
+
+        async function resetConfig() {
+            if (!confirm('Are you sure you want to reset to default values?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/reset', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to reset configuration');
+                }
+
+                const result = await response.json();
+                populateForm(result.config);
+                showAlert('Configuration reset to defaults!', 'success');
+            } catch (error) {
+                showAlert('Error resetting configuration: ' + error.message, 'error');
+            }
+        }
+
+        function getFormData() {
+            const formData = new FormData(document.getElementById('configForm'));
+            const config = {};
+
+            formData.forEach((value, key) => {
+                if (document.getElementById(key).type === 'checkbox') {
+                    config[key] = document.getElementById(key).checked;
+                } else {
+                    config[key] = parseInt(value) || value;
+                }
+            });
+
+            return config;
+        }
+
+        function showAlert(message, type) {
+            const alertElement = document.getElementById('alert');
+            alertElement.textContent = message;
+            alertElement.className = `alert ${type}`;
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertElement.className = 'alert';
+                }, 4000);
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

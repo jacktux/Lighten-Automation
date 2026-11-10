@@ -20,11 +20,19 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.Configure<EvChargingConfig>(
     builder.Configuration.GetSection("EvConfiguration"));
 
-// Register Home Assistant client
+// Register Home Assistant HTTP client
 if (!string.IsNullOrEmpty(haToken))
 {
     var uri = new Uri(haUrl.EndsWith("/") ? haUrl : haUrl + "/");
     ClientFactory.Initialize(uri, haToken);
+    
+    builder.Services.AddHttpClient<HomeAssistantService>()
+        .ConfigureHttpClient(client =>
+        {
+            client.BaseAddress = uri;
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {haToken}");
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+        });
 }
 
 // Register services
@@ -34,13 +42,15 @@ builder.Services.AddScoped(sp =>
     return new ChargingAlgorithm(config);
 });
 
-builder.Services.AddScoped<HomeAssistantService>();
 builder.Services.AddScoped<ChargingCoordinator>();
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
 
 var app = builder.Build();
+
+// Enable static files
+app.UseStaticFiles();
 
 // Start background charging cycle
 var chargingBackgroundService = app.Services.GetRequiredService<ChargingCoordinator>();
@@ -61,6 +71,7 @@ _ = Task.Run(async () =>
     }
 });
 
-app.MapGet("/", () => "Lighten Automation - EV Charging Service");
+app.MapGet("/", () => Results.Redirect("/config.html"));
+app.MapGet("/config", () => Results.File("wwwroot/config.html", "text/html"));
 app.MapControllers();
 app.Run();
