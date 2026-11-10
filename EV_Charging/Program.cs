@@ -20,6 +20,9 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.Configure<EvChargingConfig>(
     builder.Configuration.GetSection("EvConfiguration"));
 
+// Register EvChargingConfig as a scoped service for direct injection
+builder.Services.AddScoped(sp => sp.GetRequiredService<IOptions<EvChargingConfig>>().Value);
+
 // Register Home Assistant HTTP client
 if (!string.IsNullOrEmpty(haToken))
 {
@@ -31,12 +34,8 @@ if (!string.IsNullOrEmpty(haToken))
         {
             client.BaseAddress = uri;
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {haToken}");
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
         });
 }
-
-// Register EvChargingConfig as a scoped service for direct injection
-builder.Services.AddScoped(sp => sp.GetRequiredService<IOptions<EvChargingConfig>>().Value);
 
 // Register services
 builder.Services.AddScoped(sp =>
