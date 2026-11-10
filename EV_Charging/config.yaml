@@ -1,5 +1,5 @@
 ﻿name: "LA - EV Charging"
-version: "1.0.10"
+version: "1.0.11"
 slug: "ev_charging"
 description: "Lighten Automation EV Charging"
 arch:
@@ -7,7 +7,9 @@ arch:
   - aarch64
 ingress: true
 ingress_port: 9801
+ingress_path: "/"
 panel_icon: "mdi:language-csharp"
+panel_title: "EV Charging"
 ports:
   9801/tcp: 9801
 environment:

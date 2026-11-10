@@ -69,6 +69,17 @@ var app = builder.Build();
 // Enable static files
 app.UseStaticFiles();
 
+// Add middleware to handle X-Ingress-Path header for Home Assistant ingress proxy
+app.Use(async (context, next) =>
+{
+    var ingressPath = context.Request.Headers["X-Ingress-Path"].FirstOrDefault() ?? "";
+    if (!string.IsNullOrEmpty(ingressPath))
+    {
+        context.Items["IngressPath"] = ingressPath;
+    }
+    await next();
+});
+
 // Start background charging cycle
 var chargingBackgroundService = app.Services.GetRequiredService<ChargingCoordinator>();
 
@@ -88,7 +99,7 @@ _ = Task.Run(async () =>
     }
 });
 
-app.MapGet("/", () => Results.Redirect("/config.html"));
+app.MapGet("/", () => Results.File("wwwroot/config.html", "text/html"));
 app.MapGet("/config", () => Results.File("wwwroot/config.html", "text/html"));
 app.MapGet("/debug", () => Results.File("wwwroot/debug.html", "text/html"));
 app.MapGet("/diagnostic", () => Results.File("wwwroot/diagnostic.html", "text/html"));
