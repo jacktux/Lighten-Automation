@@ -1,5 +1,5 @@
 ﻿name: "LA - EV Charging"
-version: "1.0.5"
+version: "1.0.6"
 slug: "ev_charging"
 description: "Lighten Automation EV Charging"
 arch:
@@ -11,3 +11,6 @@ hassio_api: true
 panel_icon: "mdi:language-csharp"
 ports:
   9801/tcp: 9801
+environment:
+  SUPERVISOR_URL: "http://supervisor"
+  TZ: "UTC"

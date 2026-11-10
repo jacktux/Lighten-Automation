@@ -10,6 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 var haUrl = Environment.GetEnvironmentVariable("SUPERVISOR_URL") ?? "http://supervisor";
 var haToken = Environment.GetEnvironmentVariable("SUPERVISOR_TOKEN") ?? "";
 
+// Log environment configuration on startup
+var logger = LoggerFactory.Create(config => config.AddConsole())
+    .CreateLogger("Startup");
+
+logger.LogInformation("=== EV Charging Service Starting ===");
+logger.LogInformation("SUPERVISOR_URL: {Url}", string.IsNullOrEmpty(haUrl) ? "NOT SET" : haUrl);
+logger.LogInformation("SUPERVISOR_TOKEN: {TokenInfo}", 
+    string.IsNullOrEmpty(haToken) ? "NOT SET" : $"SET ({haToken.Length} chars)");
+
 // Configure Kestrel to listen on all interfaces
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -29,12 +38,18 @@ if (!string.IsNullOrEmpty(haToken))
     var uri = new Uri(haUrl.EndsWith("/") ? haUrl : haUrl + "/");
     ClientFactory.Initialize(uri, haToken);
     
+    logger.LogInformation("Initializing Home Assistant client with URL: {Url}", uri);
+    
     builder.Services.AddHttpClient<HomeAssistantService>()
         .ConfigureHttpClient(client =>
         {
             client.BaseAddress = uri;
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {haToken}");
         });
+}
+else
+{
+    logger.LogError("SUPERVISOR_TOKEN is not set. Home Assistant integration will not work.");
 }
 
 // Register services
