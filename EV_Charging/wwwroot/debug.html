@@ -1,0 +1,502 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Charging Debug Console</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(35, 134, 54, 0.3);
+        }
+
+        button.secondary {
+            background: #1f6feb;
+        }
+
+        button.secondary:hover {
+            background: #388bfd;
+        }
+
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+
+        .auto-refresh-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #79c0ff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .entity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .entity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .entity-item:hover {
+            background: #161b22;
+            border-color: #30363d;
+        }
+
+        .entity-label {
+            font-weight: 600;
+            color: #7ee787;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .entity-value {
+            color: #79c0ff;
+            font-size: 14px;
+            margin-left: 10px;
+            text-align: right;
+            flex: 0 0 auto;
+            min-width: 100px;
+        }
+
+        .entity-value.good {
+            color: #3fb950;
+        }
+
+        .entity-value.warning {
+            color: #d29922;
+        }
+
+        .entity-value.error {
+            color: #f85149;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #30363d;
+            border-top-color: #79c0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .error-message {
+            background: #3d2122;
+            border: 1px solid #da3633;
+            color: #f85149;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .refresh-interval {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+
+        .refresh-interval input {
+            width: 60px;
+            padding: 4px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 4px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #238636;
+            color: white;
+        }
+
+        .status-badge.inactive {
+            background: #da3633;
+            color: white;
+        }
+
+        .status-badge.info {
+            background: #1f6feb;
+            color: white;
+        }
+
+        .copy-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            background: #30363d;
+            border: 1px solid #21262d;
+            color: #79c0ff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #21262d;
+            border-color: #30363d;
+        }
+
+        .json-viewer {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+        }
+
+        .json-viewer pre {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 EV Charging Debug Console</h1>
+            <p>Real-time monitoring of Home Assistant entities and algorithm state</p>
+        </div>
+
+        <div class="controls">
+            <button onclick="refreshData()">🔄 Refresh Now</button>
+            <div class="auto-refresh-toggle">
+                <input type="checkbox" id="autoRefresh" checked onchange="toggleAutoRefresh()">
+                <label for="autoRefresh">Auto Refresh</label>
+            </div>
+            <div class="refresh-interval">
+                <label for="refreshInterval">Interval (s):</label>
+                <input type="number" id="refreshInterval" min="1" max="60" value="5" onchange="updateRefreshInterval()">
+            </div>
+            <button class="secondary" onclick="copyToClipboard()">📋 Copy All</button>
+        </div>
+
+        <div class="grid">
+            <!-- Entity Values Panel -->
+            <div class="panel">
+                <div class="panel-title">🏠 Home Assistant Entities</div>
+                <div id="entitiesError" class="error-message" style="display: none;"></div>
+                <div id="entitiesList" class="entity-list">
+                    <div class="loading"><div class="spinner"></div> Loading...</div>
+                </div>
+                <div class="timestamp">Last updated: <span id="entitiesTimestamp">--:--:--</span></div>
+            </div>
+
+            <!-- Algorithm State Panel -->
+            <div class="panel">
+                <div class="panel-title">⚙️ Algorithm State</div>
+                <div id="stateError" class="error-message" style="display: none;"></div>
+                <div id="stateList" class="entity-list">
+                    <div class="loading"><div class="spinner"></div> Loading...</div>
+                </div>
+                <div class="timestamp">Last updated: <span id="stateTimestamp">--:--:--</span></div>
+            </div>
+        </div>
+
+        <!-- Raw JSON Panel -->
+        <div class="panel">
+            <div class="panel-title">📊 Raw JSON Data</div>
+            <div id="jsonViewer" class="json-viewer">
+                <pre id="jsonContent">Loading...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefreshInterval = null;
+        let refreshIntervalMs = 5000;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshData();
+            if (document.getElementById('autoRefresh').checked) {
+                startAutoRefresh();
+            }
+        });
+
+        async function refreshData() {
+            try {
+                // Fetch entity values
+                const entitiesResponse = await fetch('/api/debug/entities');
+                if (entitiesResponse.ok) {
+                    const entitiesData = await entitiesResponse.json();
+                    displayEntities(entitiesData);
+                    document.getElementById('entitiesError').style.display = 'none';
+                } else {
+                    showError('entitiesError', `HTTP ${entitiesResponse.status}`);
+                }
+
+                // Fetch algorithm state
+                const stateResponse = await fetch('/api/debug/state');
+                if (stateResponse.ok) {
+                    const stateData = await stateResponse.json();
+                    displayAlgorithmState(stateData);
+                    document.getElementById('stateError').style.display = 'none';
+                } else {
+                    showError('stateError', `HTTP ${stateResponse.status}`);
+                }
+
+                // Store for JSON view
+                window.lastData = { entities: entitiesData, state: stateData };
+                updateJsonView();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError('entitiesError', error.message);
+                showError('stateError', error.message);
+            }
+        }
+
+        function displayEntities(data) {
+            const list = document.getElementById('entitiesList');
+            list.innerHTML = '';
+
+            const entities = data.entities || {};
+            Object.entries(entities).forEach(([key, value]) => {
+                const item = createEntityItem(key, value);
+                list.appendChild(item);
+            });
+
+            document.getElementById('entitiesTimestamp').textContent = new Date(data.timestamp).toLocaleTimeString();
+        }
+
+        function displayAlgorithmState(state) {
+            const list = document.getElementById('stateList');
+            list.innerHTML = '';
+
+            // Display key state values
+            const keyValues = [
+                ['Target Amps', state.targetAmps, 'A'],
+                ['Ideal Max Amps', state.idealMaxAmps, 'A'],
+                ['Available Watts', state.availableWatts, 'W'],
+                ['Solar Grab Active', state.solarGrabActive ? '✓ Yes' : '✗ No', ''],
+                ['Export Boost Active', state.exportBoostActive ? '✓ Yes' : '✗ No', ''],
+                ['Stop Required', state.stopRequired ? '✓ Yes' : '✗ No', ''],
+                ['Stop Countdown', state.stopCountdownRemaining, 's'],
+                ['Last Command', state.lastCommand || 'None', ''],
+                ['Last Set Amps', state.lastSetAmps ?? '--', 'A'],
+                ['Status', state.statusText || 'N/A', '']
+            ];
+
+            keyValues.forEach(([key, value, unit]) => {
+                const item = createEntityItem(key, `${value} ${unit}`.trim());
+                list.appendChild(item);
+            });
+
+            document.getElementById('stateTimestamp').textContent = new Date().toLocaleTimeString();
+        }
+
+        function createEntityItem(label, value) {
+            const item = document.createElement('div');
+            item.className = 'entity-item';
+
+            const labelEl = document.createElement('div');
+            labelEl.className = 'entity-label';
+            labelEl.textContent = label;
+
+            const valueEl = document.createElement('div');
+            valueEl.className = 'entity-value';
+
+            // Determine value class based on content
+            if (typeof value === 'boolean') {
+                valueEl.textContent = value ? '✓ True' : '✗ False';
+                valueEl.classList.add(value ? 'good' : 'warning');
+            } else if (typeof value === 'number') {
+                valueEl.textContent = value.toFixed(2);
+                valueEl.classList.add(value > 0 ? 'good' : 'warning');
+            } else if (typeof value === 'string') {
+                valueEl.textContent = value;
+                if (value.includes('Error') || value.includes('error')) {
+                    valueEl.classList.add('error');
+                } else if (value.includes('N/A') || value === 'None') {
+                    valueEl.classList.add('warning');
+                } else {
+                    valueEl.classList.add('good');
+                }
+            } else {
+                valueEl.textContent = JSON.stringify(value);
+                valueEl.classList.add('info');
+            }
+
+            item.appendChild(labelEl);
+            item.appendChild(valueEl);
+            return item;
+        }
+
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.textContent = `Error: ${message}`;
+            errorDiv.style.display = 'block';
+        }
+
+        function updateJsonView() {
+            const jsonContent = document.getElementById('jsonContent');
+            if (window.lastData) {
+                jsonContent.textContent = JSON.stringify(window.lastData, null, 2);
+            }
+        }
+
+        function toggleAutoRefresh() {
+            if (document.getElementById('autoRefresh').checked) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(refreshData, refreshIntervalMs);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+
+        function updateRefreshInterval() {
+            refreshIntervalMs = document.getElementById('refreshInterval').value * 1000;
+            if (document.getElementById('autoRefresh').checked) {
+                startAutoRefresh();
+            }
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('jsonContent').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Data copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    </script>
+</body>
+</html>

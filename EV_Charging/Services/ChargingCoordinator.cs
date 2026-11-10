@@ -122,4 +122,12 @@ public class ChargingCoordinator
             _logger.LogError(ex, "Error executing charging cycle");
         }
     }
+
+    /// <summary>
+    /// Get the current charging state for debugging
+    /// </summary>
+    public ChargingState GetState()
+    {
+        return _algorithm.GetState();
+    }
 }

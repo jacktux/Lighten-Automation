@@ -298,4 +298,68 @@ public class HomeAssistantService
 
         _logger.LogInformation("Configuration reset to defaults");
     }
+
+    /// <summary>
+    /// Fetch all current entity values for debugging
+    /// </summary>
+    public async Task<Dictionary<string, object>> FetchAllEntityValuesAsync()
+    {
+        var entities = new Dictionary<string, object>();
+
+        try
+        {
+            // Energy readings
+            entities["Solar Power (W)"] = await FetchSensorStateAsync("sensor.la_electrical_solar_power");
+            entities["Battery Power (W)"] = await FetchSensorStateAsync("sensor.la_electrical_battery_power");
+            entities["Battery SoC (%)"] = await FetchSensorStateAsync("sensor.la_electrical_battery_soc");
+            entities["EV Charging Power (W)"] = await FetchSensorStateAsync("sensor.wattpilot_charging_power");
+            entities["Grid Power (W)"] = await FetchSensorStateAsync("sensor.la_electrical_grid_power");
+            entities["Solar Grab Threshold (%)"] = await FetchSensorStateAsync("input_number.ev_solar_grab_threshold");
+
+            // Car status
+            entities["Car Location"] = await FetchEntityStateStringAsync("device_tracker.ev3_location");
+            entities["Car Plugged In"] = await FetchEntityStateStringAsync("binary_sensor.garage_ev3_ev_battery_plug");
+
+            // Wattpilot status
+            entities["Wattpilot Target Current (A)"] = await FetchSensorStateAsync("input_number.wattpilot_target_current_ui");
+
+            // Status
+            entities["EV Charging Status"] = await FetchEntityStateStringAsync("input_text.ev_charging_status");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to fetch all entity values");
+            entities["Error"] = ex.Message;
+        }
+
+        return entities;
+    }
+
+    /// <summary>
+    /// Fetch entity state as string
+    /// </summary>
+    private async Task<string> FetchEntityStateStringAsync(string entityId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/states/{entityId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("state", out var stateElement))
+                {
+                    return stateElement.GetString() ?? "N/A";
+                }
+            }
+            return "N/A";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch state for {EntityId}", entityId);
+            return "Error";
+        }
+    }
 }
