@@ -35,10 +35,13 @@ if (!string.IsNullOrEmpty(haToken))
         });
 }
 
+// Register EvChargingConfig as a scoped service for direct injection
+builder.Services.AddScoped(sp => sp.GetRequiredService<IOptions<EvChargingConfig>>().Value);
+
 // Register services
 builder.Services.AddScoped(sp =>
 {
-    var config = sp.GetRequiredService<IOptions<EvChargingConfig>>().Value;
+    var config = sp.GetRequiredService<EvChargingConfig>();
     return new ChargingAlgorithm(config);
 });
 
