@@ -258,6 +258,12 @@
     </style>
 </head>
 <body>
+    <nav style="display: flex; gap: 12px; margin-top: 12px;">
+        <a href="./" style="color: white; text-decoration: none; padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 6px;">🔍 Debug Console</a>
+        <a href="config" style="color: white; text-decoration: none; padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 6px;">⚡ Configuration</a>
+        <a href="diagnostic" style="color: white; text-decoration: none; padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 6px;">🔧 Diagnostics</a>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1>🔧 EV Charging Diagnostics</h1>
@@ -340,40 +346,40 @@
 
         async function testConfigStatus() {
             try {
-                const response = await fetch('/api/diagnostic/config-status');
+                const response = await fetch('api/diagnostic/config-status');
                 const data = await response.json();
 
                 const statusBadge = document.getElementById('configStatus');
                 const details = document.getElementById('configDetails');
 
                 const html = `
-                    <div class="detail-row">
-                        <span class="detail-label">Supervisor URL:</span>
-                        <span class="detail-value">${data.supervisorUrl}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token Present:</span>
-                        <span class="detail-value ${data.supervisorTokenPresent ? 'success' : 'error'}">
-                            ${data.supervisorTokenPresent ? '✓ YES' : '✗ NO'}
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token Length:</span>
-                        <span class="detail-value">${data.supervisorTokenLength} characters</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token Preview:</span>
-                        <span class="detail-value"><code>${data.supervisorTokenPreview}</code></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Environment:</span>
-                        <span class="detail-value">${data.environment}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">.NET Version:</span>
-                        <span class="detail-value">${data.dotnetVersion}</span>
-                    </div>
-                `;
+                        <div class="detail-row">
+                            <span class="detail-label">Supervisor URL:</span>
+                            <span class="detail-value">${data.supervisorUrl}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Token Present:</span>
+                            <span class="detail-value ${data.supervisorTokenPresent ? 'success' : 'error'}">
+                                ${data.supervisorTokenPresent ? '✓ YES' : '✗ NO'}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Token Length:</span>
+                            <span class="detail-value">${data.supervisorTokenLength} characters</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Token Preview:</span>
+                            <span class="detail-value"><code>${data.supervisorTokenPreview}</code></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Environment:</span>
+                            <span class="detail-value">${data.environment}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">.NET Version:</span>
+                            <span class="detail-value">${data.dotnetVersion}</span>
+                        </div>
+                    `;
 
                 details.innerHTML = html;
                 statusBadge.textContent = data.supervisorTokenPresent ? 'OK' : 'MISSING TOKEN';
@@ -387,46 +393,46 @@
 
         async function testTokenValidation() {
             try {
-                const response = await fetch('/api/diagnostic/token-validation');
+                const response = await fetch('api/diagnostic/token-validation');
                 const data = await response.json();
 
                 const statusBadge = document.getElementById('tokenStatus');
                 const details = document.getElementById('tokenDetails');
 
                 const html = `
-                    <div class="detail-row">
-                        <span class="detail-label">Token Set:</span>
-                        <span class="detail-value ${data.tokenSet ? 'success' : 'error'}">
-                            ${data.tokenSet ? '✓ YES' : '✗ NO'}
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token Length:</span>
-                        <span class="detail-value">${data.tokenLength} characters</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">URL Set:</span>
-                        <span class="detail-value ${data.urlSet ? 'success' : 'error'}">
-                            ${data.urlSet ? '✓ YES' : '✗ NO'}
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">URL Value:</span>
-                        <span class="detail-value">${data.urlValue || 'NOT SET'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token Format:</span>
-                        <span class="detail-value">${data.tokenFormat}</span>
-                    </div>
-                    ${data.recommendations && data.recommendations.length > 0 ? `
-                        <div class="recommendations">
-                            <h3>Recommendations:</h3>
-                            <ul>
-                                ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
-                            </ul>
+                        <div class="detail-row">
+                            <span class="detail-label">Token Set:</span>
+                            <span class="detail-value ${data.tokenSet ? 'success' : 'error'}">
+                                ${data.tokenSet ? '✓ YES' : '✗ NO'}
+                            </span>
                         </div>
-                    ` : ''}
-                `;
+                        <div class="detail-row">
+                            <span class="detail-label">Token Length:</span>
+                            <span class="detail-value">${data.tokenLength} characters</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">URL Set:</span>
+                            <span class="detail-value ${data.urlSet ? 'success' : 'error'}">
+                                ${data.urlSet ? '✓ YES' : '✗ NO'}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">URL Value:</span>
+                            <span class="detail-value">${data.urlValue || 'NOT SET'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Token Format:</span>
+                            <span class="detail-value">${data.tokenFormat}</span>
+                        </div>
+                        ${data.recommendations && data.recommendations.length > 0 ? `
+                            <div class="recommendations">
+                                <h3>Recommendations:</h3>
+                                <ul>
+                                    ${data.recommendations.map(r => `<li>${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
 
                 details.innerHTML = html;
                 statusBadge.textContent = data.tokenSet && data.urlSet ? 'VALID' : 'INVALID';
@@ -440,7 +446,7 @@
 
         async function testConnection() {
             try {
-                const response = await fetch('/api/diagnostic/test-connection');
+                const response = await fetch('api/diagnostic/test-connection');
                 const data = await response.json();
 
                 const statusBadge = document.getElementById('connectionStatus');
@@ -452,23 +458,23 @@
                 if (authTest && authTest.status) {
                     const isSuccess = authTest.status === 'SUCCESS';
                     html = `
-                        <div class="detail-row">
-                            <span class="detail-label">Status:</span>
-                            <span class="detail-value ${isSuccess ? 'success' : 'error'}">
-                                ${authTest.status}
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Message:</span>
-                            <span class="detail-value">${authTest.message}</span>
-                        </div>
-                        ${authTest.error ? `
                             <div class="detail-row">
-                                <span class="detail-label">Error:</span>
-                                <span class="detail-value error">${authTest.error}</span>
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value ${isSuccess ? 'success' : 'error'}">
+                                    ${authTest.status}
+                                </span>
                             </div>
-                        ` : ''}
-                    `;
+                            <div class="detail-row">
+                                <span class="detail-label">Message:</span>
+                                <span class="detail-value">${authTest.message}</span>
+                            </div>
+                            ${authTest.error ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Error:</span>
+                                    <span class="detail-value error">${authTest.error}</span>
+                                </div>
+                            ` : ''}
+                        `;
 
                     statusBadge.textContent = isSuccess ? 'CONNECTED' : 'FAILED';
                     statusBadge.className = isSuccess ? 'status-badge success' : 'status-badge error';
@@ -484,7 +490,7 @@
 
         async function testEntityValues() {
             try {
-                const response = await fetch('/api/diagnostic/entity-values');
+                const response = await fetch('api/diagnostic/entity-values');
                 const data = await response.json();
 
                 const statusBadge = document.getElementById('entityStatus');
@@ -499,30 +505,30 @@
                     if (isError || key === 'Error') errorCount++;
 
                     return `
-                        <div class="detail-row">
-                            <span class="detail-label">${key}:</span>
-                            <span class="detail-value ${isError ? 'error' : 'success'}">
-                                ${value}
-                            </span>
-                        </div>
-                    `;
+                            <div class="detail-row">
+                                <span class="detail-label">${key}:</span>
+                                <span class="detail-value ${isError ? 'error' : 'success'}">
+                                    ${value}
+                                </span>
+                            </div>
+                        `;
                 }).join('');
 
                 const html = `
-                    <div class="detail-row">
-                        <span class="detail-label">Total Entities:</span>
-                        <span class="detail-value">${data.totalEntities}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Successful:</span>
-                        <span class="detail-value success">${successCount}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Errors/N/A:</span>
-                        <span class="detail-value ${errorCount > 0 ? 'error' : 'success'}">${errorCount}</span>
-                    </div>
-                    ${entitiesHtml}
-                `;
+                        <div class="detail-row">
+                            <span class="detail-label">Total Entities:</span>
+                            <span class="detail-value">${data.totalEntities}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Successful:</span>
+                            <span class="detail-value success">${successCount}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Errors/N/A:</span>
+                            <span class="detail-value ${errorCount > 0 ? 'error' : 'success'}">${errorCount}</span>
+                        </div>
+                        ${entitiesHtml}
+                    `;
 
                 details.innerHTML = html;
                 statusBadge.textContent = errorCount === 0 ? 'OK' : `${errorCount} ERRORS`;
