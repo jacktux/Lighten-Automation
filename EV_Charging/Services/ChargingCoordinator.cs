@@ -44,11 +44,11 @@ public class ChargingCoordinator
         {
             // Step 1: Check preconditions
             var carAtHome = await _haService.IsCarAtHomeAsync();
-            var carPluggedIn = await _haService.IsCarPluggedInAsync();
+            //var carPluggedIn = await _haService.IsCarPluggedInAsync();
 
-            if (!carAtHome || !carPluggedIn)
+            if (!carAtHome)
             {
-                _logger.LogDebug("Charging disabled: Car not at home or not plugged in");
+                _logger.LogDebug("Charging disabled: Car not at home");
                 return;
             }
 
@@ -113,7 +113,7 @@ public class ChargingCoordinator
 
             // Step 10: Update Status
             var statusText = _algorithm.GenerateStatusText(readings.BatteryPower, readings.GridPower);
-            await _haService.UpdateStatusAsync(statusText);
+            //await _haService.UpdateStatusAsync(statusText);
 
             _logger.LogInformation("Charging cycle complete: {Status}", statusText);
         }
