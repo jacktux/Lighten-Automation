@@ -49,7 +49,7 @@ public class ChargingCoordinator
             if (!carAtHome)
             {
                 _logger.LogDebug("Charging disabled: Car not at home");
-                return;
+                //return;
             }
 
             // Step 2: Fetch energy readings
