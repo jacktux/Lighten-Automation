@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 // Read Home Assistant environment variables
-var haUrl = Environment.GetEnvironmentVariable("SUPERVISOR_URL") ?? "http://supervisor";
+var haUrl = Environment.GetEnvironmentVariable("SUPERVISOR_URL") ?? "http://supervisor/";
 var haToken = Environment.GetEnvironmentVariable("SUPERVISOR_TOKEN") ?? "";
 
 // Log environment configuration on startup
