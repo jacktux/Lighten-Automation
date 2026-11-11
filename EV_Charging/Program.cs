@@ -101,10 +101,16 @@ _ = Task.Run(async () =>
 
 app.MapGet("/", (IWebHostEnvironment env) =>
     Results.File(Path.Combine(env.WebRootPath, "debug.html"), "text/html"));
+app.MapGet("/config", (IWebHostEnvironment env) =>
+    Results.File(Path.Combine(env.WebRootPath, "config.html"), "text/html"));
+app.MapGet("/debug", (IWebHostEnvironment env) =>
+    Results.File(Path.Combine(env.WebRootPath, "debug.html"), "text/html"));
+app.MapGet("/diagnostic", (IWebHostEnvironment env) =>
+    Results.File(Path.Combine(env.WebRootPath, "diagnostic.html"), "text/html"));
 
 //app.MapGet("/", () => Results.File("debug.html", "text/html"));
-app.MapGet("/config", () => Results.File("config.html", "text/html"));
-app.MapGet("/debug", () => Results.File("debug.html", "text/html"));
-app.MapGet("/diagnostic", () => Results.File("diagnostic.html", "text/html"));
+//app.MapGet("/config", () => Results.File("config.html", "text/html"));
+//app.MapGet("/debug", () => Results.File("debug.html", "text/html"));
+//app.MapGet("/diagnostic", () => Results.File("diagnostic.html", "text/html"));
 app.MapControllers();
 app.Run();
