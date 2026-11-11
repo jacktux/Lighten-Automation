@@ -1,5 +1,5 @@
 ﻿name: "LA - EV Charging"
-version: "1.0.27"
+version: "1.0.28"
 slug: "ev_charging"
 description: "Lighten Automation EV Charging"
 arch:

@@ -89,7 +89,7 @@ _ = Task.Run(async () =>
     {
         try
         {
-            //await chargingBackgroundService.ExecuteChargingCycleAsync();
+            await chargingBackgroundService.ExecuteChargingCycleAsync();
             await Task.Delay(5000); // Run every 5 seconds
         }
         catch (Exception ex)
