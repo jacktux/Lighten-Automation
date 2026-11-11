@@ -1,5 +1,5 @@
 ﻿name: "LA - EV Charging"
-version: "1.0.14"
+version: "1.0.15"
 slug: "ev_charging"
 description: "Lighten Automation EV Charging"
 arch:
@@ -13,7 +13,7 @@ panel_title: "EV Charging"
 ports:
   9801/tcp: 9801
 environment:
-  SUPERVISOR_URL: "http://supervisor/"
+  SUPERVISOR_URL: "http://supervisor/core/"
   TZ: "UTC"
 homeassistant_api: true
 auth_api: true

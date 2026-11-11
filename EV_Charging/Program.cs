@@ -43,7 +43,7 @@ if (!string.IsNullOrEmpty(haToken))
     builder.Services.AddHttpClient<HomeAssistantService>()
         .ConfigureHttpClient(client =>
         {
-            client.BaseAddress = uri;
+            client.BaseAddress = uri + "core/";
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {haToken}");
         });
 }
