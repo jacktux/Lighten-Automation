@@ -346,7 +346,7 @@
         async function refreshData() {
             try {
                 // Fetch entity values
-                const entitiesResponse = await fetch('/api/debug/entities');
+                const entitiesResponse = await fetch('api/debug/entities');
                 if (entitiesResponse.ok) {
                     const entitiesData = await entitiesResponse.json();
                     displayEntities(entitiesData);
@@ -356,7 +356,7 @@
                 }
 
                 // Fetch algorithm state
-                const stateResponse = await fetch('/api/debug/state');
+                const stateResponse = await fetch('api/debug/state');
                 if (stateResponse.ok) {
                     const stateData = await stateResponse.json();
                     displayAlgorithmState(stateData);
